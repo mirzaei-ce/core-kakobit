@@ -1,0 +1,7 @@
+[main]
+host = https://www.transifex.com
+
+[kakobit.qt-translation-012x]
+file_filter = src/qt/locale/kakobit_<lang>.ts
+source_file = src/qt/locale/kakobit_en.ts
+source_lang = en

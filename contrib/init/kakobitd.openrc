@@ -1,0 +1,92 @@
+#!/sbin/runscript
+
+# backward compatibility for existing gentoo layout 
+#
+if [ -d "/var/lib/kakobit/.kakobit" ]; then
+	KAKOBITD_DEFAULT_DATADIR="/var/lib/kakobit/.kakobit"
+else
+	KAKOBITD_DEFAULT_DATADIR="/var/lib/kakobitd"
+fi
+
+KAKOBITD_CONFIGFILE=${KAKOBITD_CONFIGFILE:-/etc/kakobit/kakobit.conf}
+KAKOBITD_PIDDIR=${KAKOBITD_PIDDIR:-/var/run/kakobitd}
+KAKOBITD_PIDFILE=${KAKOBITD_PIDFILE:-${KAKOBITD_PIDDIR}/kakobitd.pid}
+KAKOBITD_DATADIR=${KAKOBITD_DATADIR:-${KAKOBITD_DEFAULT_DATADIR}}
+KAKOBITD_USER=${KAKOBITD_USER:-${KAKOBIT_USER:-kakobit}}
+KAKOBITD_GROUP=${KAKOBITD_GROUP:-kakobit}
+KAKOBITD_BIN=${KAKOBITD_BIN:-/usr/bin/kakobitd}
+KAKOBITD_NICE=${KAKOBITD_NICE:-${NICELEVEL:-0}}
+KAKOBITD_OPTS="${KAKOBITD_OPTS:-${KAKOBIT_OPTS}}"
+
+name="Kakobit Core Daemon"
+description="Kakobit cryptocurrency P2P network daemon"
+
+command="/usr/bin/kakobitd"
+command_args="-pid=\"${KAKOBITD_PIDFILE}\" \
+		-conf=\"${KAKOBITD_CONFIGFILE}\" \
+		-datadir=\"${KAKOBITD_DATADIR}\" \
+		-daemon \
+		${KAKOBITD_OPTS}"
+
+required_files="${KAKOBITD_CONFIGFILE}"
+start_stop_daemon_args="-u ${KAKOBITD_USER} \
+			-N ${KAKOBITD_NICE} -w 2000"
+pidfile="${KAKOBITD_PIDFILE}"
+
+# The retry schedule to use when stopping the daemon. Could be either
+# a timeout in seconds or multiple signal/timeout pairs (like
+# "SIGKILL/180 SIGTERM/300")
+retry="${KAKOBITD_SIGTERM_TIMEOUT}"
+
+depend() {
+	need localmount net
+}
+
+# verify
+# 1) that the datadir exists and is writable (or create it)
+# 2) that a directory for the pid exists and is writable
+# 3) ownership and permissions on the config file
+start_pre() {
+	checkpath \
+	-d \
+	--mode 0750 \
+	--owner "${KAKOBITD_USER}:${KAKOBITD_GROUP}" \
+	"${KAKOBITD_DATADIR}"
+
+	checkpath \
+	-d \
+	--mode 0755 \
+	--owner "${KAKOBITD_USER}:${KAKOBITD_GROUP}" \
+	"${KAKOBITD_PIDDIR}"
+
+	checkpath -f \
+	-o ${KAKOBITD_USER}:${KAKOBITD_GROUP} \
+	-m 0660 \
+	${KAKOBITD_CONFIGFILE}
+
+	checkconfig || return 1
+}
+
+checkconfig()
+{
+	if ! grep -qs '^rpcpassword=' "${KAKOBITD_CONFIGFILE}" ; then
+		eerror ""
+		eerror "ERROR: You must set a secure rpcpassword to run kakobitd."
+		eerror "The setting must appear in ${KAKOBITD_CONFIGFILE}"
+		eerror ""
+		eerror "This password is security critical to securing wallets "
+		eerror "and must not be the same as the rpcuser setting."
+		eerror "You can generate a suitable random password using the following"
+		eerror "command from the shell:"
+		eerror ""
+		eerror "bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'"
+		eerror ""
+		eerror "It is also recommended that you also set alertnotify so you are "
+		eerror "notified of problems:"
+		eerror ""
+		eerror "ie: alertnotify=echo %%s | mail -s \"Kakobit Alert\"" \
+			"admin@foo.com"
+		eerror ""
+		return 1
+	fi
+}

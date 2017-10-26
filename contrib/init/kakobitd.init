@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+#  kakobitd The kakobit core server.
+#
+#
+# chkconfig: 345 80 20
+# description: kakobitd
+# processname: kakobitd
+#
+
+# Source function library.
+. /etc/init.d/functions
+
+# you can override defaults in /etc/sysconfig/kakobitd, see below
+if [ -f /etc/sysconfig/kakobitd ]; then
+        . /etc/sysconfig/kakobitd
+fi
+
+RETVAL=0
+
+prog=kakobitd
+# you can override the lockfile via KAKOBITD_LOCKFILE in /etc/sysconfig/kakobitd
+lockfile=${KAKOBITD_LOCKFILE-/var/lock/subsys/kakobitd}
+
+# kakobitd defaults to /usr/bin/kakobitd, override with KAKOBITD_BIN
+kakobitd=${KAKOBITD_BIN-/usr/bin/kakobitd}
+
+# kakobitd opts default to -disablewallet, override with KAKOBITD_OPTS
+kakobitd_opts=${KAKOBITD_OPTS--disablewallet}
+
+start() {
+    echo -n $"Starting $prog: "
+    daemon $DAEMONOPTS $kakobitd $kakobitd_opts
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $prog
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f $lockfile
+    return $RETVAL
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status $prog
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage: service $prog {start|stop|status|restart}"
+        exit 1
+        ;;
+esac

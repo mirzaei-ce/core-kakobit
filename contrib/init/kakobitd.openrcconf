@@ -1,0 +1,33 @@
+# /etc/conf.d/kakobitd: config file for /etc/init.d/kakobitd
+
+# Config file location
+#KAKOBITD_CONFIGFILE="/etc/kakobit/kakobit.conf"
+
+# What directory to write pidfile to?  (created and owned by $KAKOBITD_USER)
+#KAKOBITD_PIDDIR="/var/run/kakobitd"
+
+# What filename to give the pidfile
+#KAKOBITD_PIDFILE="${KAKOBITD_PIDDIR}/kakobitd.pid"
+
+# Where to write kakobitd data (be mindful that the blockchain is large)
+#KAKOBITD_DATADIR="/var/lib/kakobitd"
+
+# User and group to own kakobitd process
+#KAKOBITD_USER="kakobit"
+#KAKOBITD_GROUP="kakobit"
+
+# Path to kakobitd executable
+#KAKOBITD_BIN="/usr/bin/kakobitd"
+
+# Nice value to run kakobitd under
+#KAKOBITD_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+KAKOBITD_OPTS="-disablewallet"
+
+# The timeout in seconds OpenRC will wait for kakobitd to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+KAKOBITD_SIGTERM_TIMEOUT=60

@@ -1,0 +1,22 @@
+[Unit]
+Description=Kakobit's distributed currency daemon
+After=network.target
+
+[Service]
+User=kakobit
+Group=kakobit
+
+Type=forking
+PIDFile=/var/lib/kakobitd/kakobitd.pid
+ExecStart=/usr/bin/kakobitd -daemon -pid=/var/lib/kakobitd/kakobitd.pid \
+-conf=/etc/kakobit/kakobit.conf -datadir=/var/lib/kakobitd -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

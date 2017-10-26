@@ -1,0 +1,6 @@
+usr/local/bin/kakobit-qt usr/bin
+share/pixmaps/kakobit32.xpm usr/share/pixmaps
+share/pixmaps/kakobit16.xpm usr/share/pixmaps
+share/pixmaps/kakobit128.png usr/share/pixmaps
+debian/kakobit-qt.desktop usr/share/applications
+debian/kakobit-qt.protocol usr/share/kde4/services/

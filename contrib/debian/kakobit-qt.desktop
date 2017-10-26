@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Kakobit
+Comment=Kakobit P2P Cryptocurrency
+Comment[fr]=Kakobit, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Kakobit, eşten eşe kriptografik sanal para birimi
+Exec=kakobit-qt %u
+Terminal=false
+Type=Application
+Icon=kakobit128
+MimeType=x-scheme-handler/kakobit;
+Categories=Office;Finance;
